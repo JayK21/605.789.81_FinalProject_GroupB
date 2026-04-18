@@ -1,5 +1,12 @@
 package edu.jhu.eventservice.repositories;
 
-public class UserRepository {
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import edu.jhu.eventservice.models.User;
+
+public interface UserRepository extends JpaRepository<User, Integer>{
+    Optional<User> findByUserId(Integer userId);
 
 }
