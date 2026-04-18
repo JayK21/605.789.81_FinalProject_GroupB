@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: event-service
+
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+app:
+  security:
+    jwt:
+      # TODO: Replace with an environment-driven secret in production.
+      # Must be at least 256 bits (32+ characters) for HS256.
+      secret: "change-me-change-me-change-me-change-me-change-me"
+      issuer: "event-service"
+      expiration-minutes: 60
+
+logging:
+  level:
+    root: INFO
+    edu.jhu.eventservice: DEBUG
+    org.springframework.security: INFO
