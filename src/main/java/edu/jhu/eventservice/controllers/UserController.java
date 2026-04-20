@@ -66,7 +66,7 @@ public class UserController {
     
     // Update an existing professor
     @PutMapping("/{userId}")
-    public ResponseEntity<String> updateUSer(@PathVariable int userId, @RequestParam(value="firstName") String firstName, 
+    public ResponseEntity<String> updateUser(@PathVariable int userId, @RequestParam(value="firstName") String firstName, 
     		@RequestParam(value="lastName") String lastName,
     		@RequestParam(value="email") String email, @RequestParam(value="password") String password) {
     	List<String> errors = validateUser(firstName, lastName, email, password);
