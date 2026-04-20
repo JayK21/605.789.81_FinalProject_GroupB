@@ -19,7 +19,7 @@ import edu.jhu.eventservice.models.User;
 import edu.jhu.eventservice.services.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 	private final UserService us;
 

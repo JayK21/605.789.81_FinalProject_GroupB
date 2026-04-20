@@ -22,7 +22,7 @@ import edu.jhu.eventservice.models.User;
 import edu.jhu.eventservice.services.EventService;
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/api/v1/events")
 public class EventController {
 	private final EventService es;
 
