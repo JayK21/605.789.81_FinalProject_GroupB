@@ -1,6 +1,0 @@
-/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/EventServiceApplication.java
-/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/config/OpenApiConfig.java
-/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/security/AuthenticatedUser.java
-/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/security/JwtAuthenticationFilter.java
-/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/security/JwtService.java
-/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/security/SecurityConfig.java
