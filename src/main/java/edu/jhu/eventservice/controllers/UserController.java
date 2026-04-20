@@ -51,7 +51,7 @@ public class UserController {
     // Add a new user
     @PostMapping
     public ResponseEntity<String> addUser(@RequestParam(value="firstName") String firstName, @RequestParam(value="lastName") String lastName,
-    		@RequestParam(value="email") String email, @RequestParam(value="officeLocation") String password) {
+    		@RequestParam(value="email") String email, @RequestParam(value="password") String password) {
     	List<String> errors = validateUser(firstName, lastName, email, password);
         
         if (!errors.isEmpty()) {

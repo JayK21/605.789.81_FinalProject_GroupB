@@ -4,15 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -40,9 +39,13 @@ public class Event {
     @Column(name = "maxCapacity", unique = false, nullable = true)
 	private Integer maxCapacity;
     
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = true)
-    @JsonBackReference
+    // TODO: Replace with proper Registration entity (spec requires RSVP with status + timestamp).
+    @ManyToMany
+    @JoinTable(
+        name = "event_attendees",
+        joinColumns = @JoinColumn(name = "event_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
 	private List<User> attendees;
     
     public Event() {}
