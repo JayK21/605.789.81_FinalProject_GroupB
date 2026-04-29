@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,7 @@ import edu.jhu.eventservice.models.User;
 import edu.jhu.eventservice.services.EventService;
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/api/v1/events")
 public class EventController {
 	private final EventService es;
 
@@ -70,42 +69,46 @@ public class EventController {
     }
     
     // Update an existing professor
-//    @PutMapping("/{userId}")
-//    public ResponseEntity<String> updateUser(@PathVariable int userId, @RequestParam(value="firstName") String firstName, 
-//    		@RequestParam(value="lastName") String lastName,
-//    		@RequestParam(value="email") String email, @RequestParam(value="password") String password) {
-//    	List<String> errors = validateEvent(firstName, lastName, email, password);
-//        
-//        if (!errors.isEmpty()) {
-//        	System.out.println(errors.toString());
-//        	return ResponseEntity.badRequest().build();
-//        }
-//        User existingUser = es.getEventById(userId);
-//        if (existingUser != null) {
-//            existingUser.setFirstName(firstName);
-//            existingUser.setLastName(lastName);
-//            existingUser.setEmail(email);
-//            existingUser.setPassword(password);
-//            es.addEvent(existingUser); 
-//            return ResponseEntity.status(HttpStatus.OK).body("User updated successfully");
-//        } else {
-//        	System.out.println("User with id " + userId + " not found");
-//        	return ResponseEntity.notFound().build(); 
-//        }
-//    }
-//    
-//    // Delete a professor
-//    @DeleteMapping("/{userId}")
-//    public ResponseEntity<String> deleteUser(@PathVariable int userId) {
-//        User user = es.getEventById(userId);
-//        if (user != null) {
-//            es.deleteEvent(user);
-//            return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
-//        } else {
-//        	System.out.println("User with id " + userId + " not found");
-//        	return ResponseEntity.notFound().build();
-//        }
-//    }
+    @PutMapping("/{eventId}")
+    public ResponseEntity<String> updateEvent(@PathVariable int eventId, @RequestParam(value="title") String title, @RequestParam(value="description") String description,
+    		@RequestParam(value="location") String location, @RequestParam(value="date") LocalDate date,
+    		@RequestParam(value="time") LocalTime time, @RequestParam(value="maxCapacity") Integer maxCapacity,
+    		@RequestParam(value="userIds") List<User> attendees ) {
+    	List<String> errors = validateEvent(title, description, location, date, time, maxCapacity, attendees);
+        
+        if (!errors.isEmpty()) {
+        	System.out.println(errors.toString());
+        	return ResponseEntity.badRequest().build();
+        }
+        Event existingEvent = es.getEventById(eventId);
+        if (existingEvent != null) {
+            existingEvent.setTitle(title);
+            existingEvent.setDescription(description);
+            existingEvent.setLocation(location);
+            existingEvent.setDate(date);
+            existingEvent.setTime(time);
+            existingEvent.setMaxCapacity(maxCapacity);
+            existingEvent.setAttendees(attendees);
+            es.addEvent(existingEvent); 
+            return ResponseEntity.status(HttpStatus.OK).body("Event updated successfully");
+        } else {
+        	System.out.println("Event with id " + eventId + " not found");
+        	return ResponseEntity.notFound().build(); 
+        }
+    }
+    
+    // Delete a professor
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
+        Event event = es.getEventById(eventId);
+        if (event != null) {
+            es.deleteEvent(event);
+            return ResponseEntity.status(HttpStatus.OK).body("Event deleted successfully");
+        } else {
+        	System.out.println("Event with id " + eventId + " not found");
+        	return ResponseEntity.notFound().build();
+        }
+    }
     
     private List<String> validateEvent(String title, String description, String location, LocalDate date, LocalTime time, 
     		Integer maxCapacity, List<User> attendees){

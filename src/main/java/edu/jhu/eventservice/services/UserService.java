@@ -3,10 +3,12 @@ package edu.jhu.eventservice.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import edu.jhu.eventservice.models.User;
 import edu.jhu.eventservice.repositories.UserRepository;
 
+@Service
 public class UserService {
     @Autowired
     private UserRepository ur;
