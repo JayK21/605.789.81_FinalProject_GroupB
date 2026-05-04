@@ -1,5 +1,6 @@
 package edu.jhu.eventservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,19 +25,25 @@ public class User {
     @Column(name = "email", unique = true, nullable = false)
 	private String email;
 
+    @Column(name = "phoneNumber", nullable = false)
+	private String phoneNumber;
+
+    @JsonIgnore
     @Column(name = "password", nullable = false)
 	private String password;
-    
+
     public User() {}
-    
+
     public User(Integer userId, @NotBlank(message = "First name is required") String firstName,
 			@NotBlank(message = "Last name is required") String lastName,
-			@NotBlank(message = "Email is required") String email, 
+			@NotBlank(message = "Email is required") String email,
+			@NotBlank(message = "Phone number is required") String phoneNumber,
 			@NotBlank(message = "Password is required") String password) {
     	this.firstName = firstName;
     	this.lastName = lastName;
     	this.email = email;
-    	this.password = password;   	
+    	this.phoneNumber = phoneNumber;
+    	this.password = password;
     }
 
 	public Integer getUserId() {
@@ -71,6 +78,14 @@ public class User {
 		this.email = email;
 	}
 
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
 	public String getPassword() {
 		return password;
 	}
@@ -82,7 +97,7 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
-				+ ", password=" + password + "]";
+				+ ", phoneNumber=" + phoneNumber + "]";
 	}
     
     
