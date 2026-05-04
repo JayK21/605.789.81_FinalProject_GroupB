@@ -30,7 +30,7 @@ public class UserController {
         this.us = us;
     }
     
-    // Public lookup — returns name and phone only (req 2)
+    // Public lookup — returns name and phone only
     @GetMapping("/{userId}")
     public ResponseEntity<UserPublicResponse> getUserById(@PathVariable int userId) {
         User user = us.getUserById(userId);
@@ -40,7 +40,7 @@ public class UserController {
         return ResponseEntity.ok(new UserPublicResponse(user.getFirstName(), user.getLastName(), user.getPhoneNumber()));
     }
 
-    // Full profile for the authenticated user only (req 3)
+    // Full profile for the authenticated user only
     @GetMapping("/me")
     public ResponseEntity<UserSelfResponse> getMyProfile() {
         return AuthenticatedUser.currentUserId()
@@ -50,7 +50,7 @@ public class UserController {
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
     
-    // Update own profile — only the authenticated user may update their own account (reqs 4)
+    // Update own profile — only the authenticated user may update their own account
     @PutMapping("/{userId}")
     public ResponseEntity<String> updateUser(@PathVariable int userId, @RequestParam(value="firstName") String firstName,
     		@RequestParam(value="lastName") String lastName,
@@ -84,7 +84,7 @@ public class UserController {
         }
     }
 
-    // Delete own account only (req 5)
+    // Delete own account only 
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable int userId) {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);

@@ -6,13 +6,16 @@ edu/jhu/eventservice/controllers/UserController.class
 edu/jhu/eventservice/dto/RegisterRequest.class
 edu/jhu/eventservice/models/Event.class
 edu/jhu/eventservice/services/UserService.class
+edu/jhu/eventservice/dto/UserPublicResponse.class
 edu/jhu/eventservice/security/SecurityConfig.class
 edu/jhu/eventservice/dto/AuthResponse.class
 edu/jhu/eventservice/controllers/EventController.class
 edu/jhu/eventservice/models/User.class
+edu/jhu/eventservice/dto/UserSelfResponse.class
 edu/jhu/eventservice/security/JwtService.class
 edu/jhu/eventservice/security/JwtAuthenticationFilter.class
 edu/jhu/eventservice/EventServiceApplication.class
+edu/jhu/eventservice/dto/EventRequest.class
 edu/jhu/eventservice/repositories/UserRepository.class
 edu/jhu/eventservice/services/EventService.class
 edu/jhu/eventservice/config/OpenApiConfig.class

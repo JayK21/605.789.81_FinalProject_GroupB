@@ -1,8 +1,5 @@
 package edu.jhu.eventservice.controllers;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -12,123 +9,112 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.jhu.eventservice.dto.EventRequest;
 import edu.jhu.eventservice.models.Event;
 import edu.jhu.eventservice.models.User;
+import edu.jhu.eventservice.security.AuthenticatedUser;
 import edu.jhu.eventservice.services.EventService;
+import edu.jhu.eventservice.services.UserService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/events")
 public class EventController {
-	private final EventService es;
 
-    // Constructor
-    public EventController(EventService es) {
+    private final EventService es;
+    private final UserService us;
+
+    public EventController(EventService es, UserService us) {
         this.es = es;
+        this.us = us;
     }
-    
-    // Get all events
+
+    // Get all events (req 10)
     @GetMapping
     public ResponseEntity<List<Event>> getAllEvents() {
         List<Event> events = es.getAllEvents();
         if (events.isEmpty()) {
-        	return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(events);
     }
 
-    // Get an event by eventId
+    // Get a single event (req 7)
     @GetMapping("/{eventId}")
     public ResponseEntity<Event> getEventById(@PathVariable int eventId) {
-    	Event event = es.getEventById(eventId);
+        Event event = es.getEventById(eventId);
         if (event == null) {
-        	return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(event);
     }
-    
-    // Add a new event
+
+    // Create event — authenticated user becomes the organizer (req 6)
     @PostMapping
-    public ResponseEntity<String> addEvent(@RequestParam(value="title") String title, @RequestParam(value="description") String description,
-    		@RequestParam(value="location") String location, @RequestParam(value="date") LocalDate date,
-    		@RequestParam(value="time") LocalTime time, @RequestParam(value="maxCapacity") Integer maxCapacity,
-    		@RequestParam(value="userIds") List<User> attendees ) {
-    	List<String> errors = validateEvent(title, description, location, date, time, maxCapacity, attendees);
-        
-        if (!errors.isEmpty()) {
-        	System.out.println(errors.toString());
-        	return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> addEvent(@Valid @RequestBody EventRequest request) {
+        Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
+        if (callerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
         }
-        
-        Event event = new Event(null, title, description, location, date, time, maxCapacity, attendees);
+
+        User organizer = us.getUserById(callerId);
+        if (organizer == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authenticated user not found");
+        }
+
+        Event event = new Event(null, request.getTitle(), request.getDescription(), request.getLocation(),
+                request.getDate(), request.getTime(), request.getMaxCapacity(), organizer, List.of());
         es.addEvent(event);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Event added successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Event created successfully");
     }
-    
-    // Update an existing professor
+
+    // Update event — organizer only (req 8)
     @PutMapping("/{eventId}")
-    public ResponseEntity<String> updateEvent(@PathVariable int eventId, @RequestParam(value="title") String title, @RequestParam(value="description") String description,
-    		@RequestParam(value="location") String location, @RequestParam(value="date") LocalDate date,
-    		@RequestParam(value="time") LocalTime time, @RequestParam(value="maxCapacity") Integer maxCapacity,
-    		@RequestParam(value="userIds") List<User> attendees ) {
-    	List<String> errors = validateEvent(title, description, location, date, time, maxCapacity, attendees);
-        
-        if (!errors.isEmpty()) {
-        	System.out.println(errors.toString());
-        	return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> updateEvent(@PathVariable int eventId, @Valid @RequestBody EventRequest request) {
+        Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
+        if (callerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
         }
+
         Event existingEvent = es.getEventById(eventId);
-        if (existingEvent != null) {
-            existingEvent.setTitle(title);
-            existingEvent.setDescription(description);
-            existingEvent.setLocation(location);
-            existingEvent.setDate(date);
-            existingEvent.setTime(time);
-            existingEvent.setMaxCapacity(maxCapacity);
-            existingEvent.setAttendees(attendees);
-            es.addEvent(existingEvent); 
-            return ResponseEntity.status(HttpStatus.OK).body("Event updated successfully");
-        } else {
-        	System.out.println("Event with id " + eventId + " not found");
-        	return ResponseEntity.notFound().build(); 
+        if (existingEvent == null) {
+            return ResponseEntity.notFound().build();
         }
+        if (!existingEvent.getOrganizer().getUserId().equals(callerId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the event organizer may update this event");
+        }
+
+        existingEvent.setTitle(request.getTitle());
+        existingEvent.setDescription(request.getDescription());
+        existingEvent.setLocation(request.getLocation());
+        existingEvent.setDate(request.getDate());
+        existingEvent.setTime(request.getTime());
+        existingEvent.setMaxCapacity(request.getMaxCapacity());
+        es.addEvent(existingEvent);
+        return ResponseEntity.ok("Event updated successfully");
     }
-    
-    // Delete a professor
+
+    // Cancel event — organizer only (req 9)
     @DeleteMapping("/{eventId}")
     public ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
+        Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
+        if (callerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+        }
+
         Event event = es.getEventById(eventId);
-        if (event != null) {
-            es.deleteEvent(event);
-            return ResponseEntity.status(HttpStatus.OK).body("Event deleted successfully");
-        } else {
-        	System.out.println("Event with id " + eventId + " not found");
-        	return ResponseEntity.notFound().build();
+        if (event == null) {
+            return ResponseEntity.notFound().build();
         }
-    }
-    
-    private List<String> validateEvent(String title, String description, String location, LocalDate date, LocalTime time, 
-    		Integer maxCapacity, List<User> attendees){
-    	List<String> errors = new ArrayList<>();
-    	if (title == null || title.isEmpty()) {
-        	errors.add("Title cannot be empty");
+        if (!event.getOrganizer().getUserId().equals(callerId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the event organizer may cancel this event");
         }
-        
-        if (location == null || location.isEmpty()) {
-        	errors.add("Location cannot be empty");
-        }
-        
-        if (date == null) {
-        	errors.add("Date cannot be empty");
-        }
-        
-        if (time == null) {
-        	errors.add("Time cannot be empty");
-        }
-        
-        return errors;
+
+        es.deleteEvent(event);
+        return ResponseEntity.ok("Event cancelled successfully");
     }
 }

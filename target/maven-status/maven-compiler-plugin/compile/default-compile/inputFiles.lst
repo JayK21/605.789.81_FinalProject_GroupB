@@ -4,8 +4,11 @@
 /Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/controllers/EventController.java
 /Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/controllers/UserController.java
 /Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/dto/AuthResponse.java
+/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/dto/EventRequest.java
 /Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/dto/LoginRequest.java
 /Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/dto/RegisterRequest.java
+/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/dto/UserPublicResponse.java
+/Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/dto/UserSelfResponse.java
 /Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/models/Event.java
 /Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/models/User.java
 /Users/jay/Documents/JohnsHopkins/API/Final Project/605.789.81_FinalProject_GroupB/src/main/java/edu/jhu/eventservice/repositories/EventRepository.java

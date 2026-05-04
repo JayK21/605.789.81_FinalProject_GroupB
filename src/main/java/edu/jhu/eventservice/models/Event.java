@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -38,8 +39,12 @@ public class Event {
     
     @Column(name = "maxCapacity", unique = false, nullable = true)
 	private Integer maxCapacity;
-    
-    // TODO: Replace with proper Registration entity (spec requires RSVP with status + timestamp).
+
+    @ManyToOne
+    @JoinColumn(name = "organizer_id", nullable = false)
+    private User organizer;
+
+    // TODO: Replace with proper Registration entity
     @ManyToMany
     @JoinTable(
         name = "event_attendees",
@@ -51,8 +56,7 @@ public class Event {
     public Event() {}
 
 	public Event(Integer eventId, String title, String description, String location, LocalDate date, LocalTime time,
-			Integer maxCapacity, List<User> attendees) {
-		super();
+			Integer maxCapacity, User organizer, List<User> attendees) {
 		this.eventId = eventId;
 		this.title = title;
 		this.description = description;
@@ -60,6 +64,7 @@ public class Event {
 		this.date = date;
 		this.time = time;
 		this.maxCapacity = maxCapacity;
+		this.organizer = organizer;
 		this.attendees = attendees;
 	}
 
@@ -119,6 +124,14 @@ public class Event {
 		this.maxCapacity = maxCapacity;
 	}
 
+	public User getOrganizer() {
+		return organizer;
+	}
+
+	public void setOrganizer(User organizer) {
+		this.organizer = organizer;
+	}
+
 	public List<User> getAttendees() {
 		return attendees;
 	}
@@ -130,8 +143,8 @@ public class Event {
 	@Override
 	public String toString() {
 		return "Event [eventId=" + eventId + ", title=" + title + ", description=" + description + ", location="
-				+ location + ", date=" + date + ", time=" + time + ", maxCapacity=" + maxCapacity + ", attendees="
-				+ attendees + "]";
+				+ location + ", date=" + date + ", time=" + time + ", maxCapacity=" + maxCapacity
+				+ ", organizer=" + (organizer != null ? organizer.getUserId() : null) + "]";
 	}
     
 }
