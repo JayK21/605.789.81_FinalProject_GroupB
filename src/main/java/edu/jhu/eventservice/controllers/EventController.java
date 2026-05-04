@@ -1,5 +1,6 @@
 package edu.jhu.eventservice.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.jhu.eventservice.dto.EventRequest;
@@ -116,5 +118,75 @@ public class EventController {
 
         es.deleteEvent(event);
         return ResponseEntity.ok("Event cancelled successfully");
+    }
+    
+    // Register user for event (req 13)
+    @PostMapping("/register/{eventId}")
+    public ResponseEntity<String> registerUserForEvent(@PathVariable int eventId, @RequestParam(value="userId") int userId){
+        Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
+        if (callerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+        }
+        
+        Event event = es.getEventById(eventId);
+        if (event == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        User user = us.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        List<User> attendees = event.getAttendees();
+        if (attendees.contains(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is already registered for event");
+        }
+        
+        if (attendees.size() >= event.getMaxCapacity()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Event is at max capacity");
+        }
+        
+        attendees.add(user);
+        es.addEvent(event);
+        return ResponseEntity.ok("User registered for event successfully");
+    }
+    
+    @PutMapping("/register/{eventId}")
+    public ResponseEntity<String> unregisterUserForEvent(@PathVariable int eventId, @RequestParam(value="userId") int userId){
+        Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
+        if (callerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+        }
+        
+        Event event = es.getEventById(eventId);
+        if (event == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        User user = us.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        if (event.getDate().isBefore(LocalDate.now())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot unregister after event has occurred");
+        }
+        
+        List<User> attendees = event.getAttendees();
+        if (!attendees.contains(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not registered for this event");
+        }
+        
+        User userToRemove = null;
+        for (User u : attendees) {
+        	if (u.getUserId() == userId) {
+        		userToRemove = u;
+        	}
+        }
+        attendees.remove(userToRemove);
+        
+        es.addEvent(event);
+        return ResponseEntity.ok("User removed from event");
     }
 }

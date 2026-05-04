@@ -37,7 +37,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(new UserPublicResponse(user.getFirstName(), user.getLastName(), user.getPhoneNumber()));
+        return ResponseEntity.ok(new UserPublicResponse(user.getUserId(), user.getFirstName(), user.getLastName(), user.getPhoneNumber()));
     }
 
     // Full profile for the authenticated user only
@@ -49,6 +49,14 @@ public class UserController {
                         u.getUserId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhoneNumber())))
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
+    
+    @GetMapping()
+    public ResponseEntity<List<UserPublicResponse>> getAllUsers(){
+    	List<UserPublicResponse> users = us.getAllUsers(true);
+        if (users.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(users);    }
     
     // Update own profile — only the authenticated user may update their own account
     @PutMapping("/{userId}")
