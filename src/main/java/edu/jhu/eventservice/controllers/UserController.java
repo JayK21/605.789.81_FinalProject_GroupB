@@ -16,17 +16,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.jhu.eventservice.dto.UserPublicResponse;
 import edu.jhu.eventservice.dto.UserSelfResponse;
+import edu.jhu.eventservice.models.Event;
 import edu.jhu.eventservice.models.User;
 import edu.jhu.eventservice.security.AuthenticatedUser;
+import edu.jhu.eventservice.services.EventService;
 import edu.jhu.eventservice.services.UserService;
 
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
+	private final EventService es;
 	private final UserService us;
 
     // Constructor
-    public UserController(UserService us) {
+    public UserController(EventService es, UserService us) {
+        this.es = es;
         this.us = us;
     }
     
@@ -110,6 +114,21 @@ public class UserController {
         } else {
         	return ResponseEntity.notFound().build();
         }
+    }
+    
+    @GetMapping("/register/{eventId}")
+    public ResponseEntity<List<User>> getUsersRegisteredForEvent(@PathVariable int eventId){
+        Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
+        if (callerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        Event event = es.getEventById(eventId);
+        if (event == null) {
+            return ResponseEntity.notFound().build();
+        }        
+        
+    	return ResponseEntity.ok(event.getAttendees());
     }
     
     private List<String> validateUser(String firstName, String lastName, String email) {

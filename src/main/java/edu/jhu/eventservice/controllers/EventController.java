@@ -189,4 +189,20 @@ public class EventController {
         es.addEvent(event);
         return ResponseEntity.ok("User removed from event");
     }
+    
+    
+    @GetMapping("/register/{userId}")
+    public ResponseEntity<List<Event>> getEventsByUser(@PathVariable int userId){
+        Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
+        if (callerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        User user = us.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+    	return ResponseEntity.ok(es.getEventsByUser(user));
+    }
 }

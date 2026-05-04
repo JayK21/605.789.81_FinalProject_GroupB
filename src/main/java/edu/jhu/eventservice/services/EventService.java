@@ -1,5 +1,6 @@
 package edu.jhu.eventservice.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,4 +38,17 @@ public class EventService {
     public void deleteEvent(Event event) {
         er.delete(event);
     }
+
+	public List<Event> getEventsByUser(User user) {
+		List<Event> events = getAllEvents();
+		List<Event> eventsWithUser = new ArrayList<>();
+		
+		for (Event e : events) {
+			if (e.getAttendees().contains(user)) {
+				eventsWithUser.add(e);
+			}
+		}
+		
+		return eventsWithUser;
+	}
 }
