@@ -35,7 +35,7 @@ public class EventController {
         this.us = us;
     }
 
-    // Get all events; ?upcoming=true restricts to events that have not yet occurred (req 10)
+    // Get all events; ?upcoming=true restricts to events that have not yet occurred
     @GetMapping
     public ResponseEntity<List<Event>> getAllEvents(
             @RequestParam(value = "upcoming", required = false, defaultValue = "false") boolean upcoming) {
@@ -46,7 +46,7 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
-    // Get a single event (req 7)
+    // Get a single event
     @GetMapping("/{eventId}")
     public ResponseEntity<Event> getEventById(@PathVariable int eventId) {
         Event event = es.getEventById(eventId);
@@ -56,7 +56,7 @@ public class EventController {
         return ResponseEntity.ok(event);
     }
 
-    // Create event — authenticated user becomes the organizer (req 6)
+    // Create event — authenticated user becomes the organizer
     @PostMapping
     public ResponseEntity<String> addEvent(@Valid @RequestBody EventRequest request) {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
@@ -75,7 +75,7 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Event created successfully");
     }
 
-    // Update event — organizer only (req 8)
+    // Update event — organizer only
     @PutMapping("/{eventId}")
     public ResponseEntity<String> updateEvent(@PathVariable int eventId, @Valid @RequestBody EventRequest request) {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
@@ -101,7 +101,7 @@ public class EventController {
         return ResponseEntity.ok("Event updated successfully");
     }
 
-    // Cancel event — organizer only (req 9)
+    // Cancel event — organizer only
     @DeleteMapping("/{eventId}")
     public ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
@@ -121,7 +121,7 @@ public class EventController {
         return ResponseEntity.ok("Event cancelled successfully");
     }
     
-    // Register the authenticated caller for an event (req 13)
+    // Register the authenticated caller for an event
     @PostMapping("/register/{eventId}")
     public ResponseEntity<String> registerUserForEvent(@PathVariable int eventId) {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
@@ -157,7 +157,7 @@ public class EventController {
         return ResponseEntity.ok("Registered for event successfully");
     }
 
-    // Unregister the authenticated caller from an event (req 14)
+    // Unregister the authenticated caller from an event
     @DeleteMapping("/register/{eventId}")
     public ResponseEntity<String> unregisterUserForEvent(@PathVariable int eventId) {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
@@ -188,7 +188,7 @@ public class EventController {
         return ResponseEntity.ok("Unregistered from event successfully");
     }
 
-    // Returns upcoming events the authenticated caller is registered for (req 17)
+    // Returns upcoming events the authenticated caller is registered for 
     @GetMapping("/register/me")
     public ResponseEntity<List<Event>> getMyUpcomingEvents() {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);

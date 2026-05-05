@@ -116,7 +116,7 @@ public class UserController {
         }
     }
     
-    // Only the event organizer may view the attendee list (req 16)
+    // Only the event organizer may view the attendee list
     @GetMapping("/register/{eventId}")
     public ResponseEntity<List<UserPublicResponse>> getUsersRegisteredForEvent(@PathVariable int eventId){
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
