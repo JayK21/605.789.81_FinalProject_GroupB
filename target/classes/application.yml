@@ -16,8 +16,6 @@ springdoc:
 app:
   security:
     jwt:
-      # TODO: Replace with an environment-driven secret in production.
-      # Must be at least 256 bits (32+ characters) for HS256.
       secret: "change-me-change-me-change-me-change-me-change-me"
       issuer: "event-service"
       expiration-minutes: 60
