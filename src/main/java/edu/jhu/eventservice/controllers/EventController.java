@@ -139,6 +139,10 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authenticated user not found");
         }
 
+        if (event.getDate().isBefore(LocalDate.now())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot register after event has occurred");
+        }
+        
         List<User> attendees = event.getAttendees();
         if (attendees.contains(caller)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("You are already registered for this event");
