@@ -49,7 +49,6 @@ public class JwtService {
                     .getPayload();
             return Optional.ofNullable(claims.getSubject());
         } catch (Exception ex) {
-            // TODO: Log token validation failures via proper logger.
             return Optional.empty();
         }
     }

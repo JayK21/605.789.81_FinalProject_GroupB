@@ -44,7 +44,6 @@ public class Event {
     @JoinColumn(name = "organizer_id", nullable = false)
     private User organizer;
 
-    // TODO: Replace with proper Registration entity
     @ManyToMany
     @JoinTable(
         name = "event_attendees",
