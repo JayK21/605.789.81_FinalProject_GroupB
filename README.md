@@ -10,8 +10,6 @@ A RESTful API for managing events and RSVPs. Users can create accounts, create e
 
 ## Running Locally
 
-**Prerequisites:** Java 17, Maven, MySQL running on port 3306
-
 1. Clone the repo and navigate to the project directory
 2. Create a MySQL database named `event_service`
 3. Build and run:
