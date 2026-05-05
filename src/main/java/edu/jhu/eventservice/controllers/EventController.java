@@ -35,10 +35,11 @@ public class EventController {
         this.us = us;
     }
 
-    // Get all events (req 10)
+    // Get all events; ?upcoming=true restricts to events that have not yet occurred (req 10)
     @GetMapping
-    public ResponseEntity<List<Event>> getAllEvents() {
-        List<Event> events = es.getAllEvents();
+    public ResponseEntity<List<Event>> getAllEvents(
+            @RequestParam(value = "upcoming", required = false, defaultValue = "false") boolean upcoming) {
+        List<Event> events = upcoming ? es.getUpcomingEvents() : es.getAllEvents();
         if (events.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -120,81 +121,82 @@ public class EventController {
         return ResponseEntity.ok("Event cancelled successfully");
     }
     
-    // Register user for event (req 13)
+    // Register the authenticated caller for an event (req 13)
     @PostMapping("/register/{eventId}")
-    public ResponseEntity<String> registerUserForEvent(@PathVariable int eventId, @RequestParam(value="userId") int userId){
+    public ResponseEntity<String> registerUserForEvent(@PathVariable int eventId) {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
         if (callerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
         }
-        
+
         Event event = es.getEventById(eventId);
         if (event == null) {
             return ResponseEntity.notFound().build();
         }
-        
-        User user = us.getUserById(userId);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
+
+        User caller = us.getUserById(callerId);
+        if (caller == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authenticated user not found");
         }
-        
+
         List<User> attendees = event.getAttendees();
-        if (attendees.contains(user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is already registered for event");
+        if (attendees.contains(caller)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("You are already registered for this event");
         }
 
         if (event.getMaxCapacity() != null && attendees.size() >= event.getMaxCapacity()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Event is at max capacity");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Event is at max capacity");
         }
-        
-        attendees.add(user);
+
+        attendees.add(caller);
         es.addEvent(event);
-        return ResponseEntity.ok("User registered for event successfully");
+        return ResponseEntity.ok("Registered for event successfully");
     }
-    
-    @PutMapping("/register/{eventId}")
-    public ResponseEntity<String> unregisterUserForEvent(@PathVariable int eventId, @RequestParam(value="userId") int userId){
+
+    // Unregister the authenticated caller from an event (req 14)
+    @DeleteMapping("/register/{eventId}")
+    public ResponseEntity<String> unregisterUserForEvent(@PathVariable int eventId) {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
         if (callerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
         }
-        
+
         Event event = es.getEventById(eventId);
         if (event == null) {
             return ResponseEntity.notFound().build();
         }
-        
-        User user = us.getUserById(userId);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        
+
         if (event.getDate().isBefore(LocalDate.now())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot unregister after event has occurred");
         }
-        
+
+        User caller = us.getUserById(callerId);
+        if (caller == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authenticated user not found");
+        }
+
         List<User> attendees = event.getAttendees();
-        if (!attendees.remove(user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not registered for this event");
+        if (!attendees.remove(caller)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("You are not registered for this event");
         }
 
         es.addEvent(event);
-        return ResponseEntity.ok("User removed from event");
+        return ResponseEntity.ok("Unregistered from event successfully");
     }
-    
-    
-    @GetMapping("/register/{userId}")
-    public ResponseEntity<List<Event>> getEventsByUser(@PathVariable int userId){
+
+    // Returns upcoming events the authenticated caller is registered for (req 17)
+    @GetMapping("/register/me")
+    public ResponseEntity<List<Event>> getMyUpcomingEvents() {
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
         if (callerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
-        User user = us.getUserById(userId);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
+
+        User caller = us.getUserById(callerId);
+        if (caller == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
-    	return ResponseEntity.ok(es.getEventsByUser(user));
+
+        return ResponseEntity.ok(es.getUpcomingEventsByUser(caller));
     }
 }

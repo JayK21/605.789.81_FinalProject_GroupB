@@ -116,6 +116,7 @@ public class UserController {
         }
     }
     
+    // Only the event organizer may view the attendee list (req 16)
     @GetMapping("/register/{eventId}")
     public ResponseEntity<List<UserPublicResponse>> getUsersRegisteredForEvent(@PathVariable int eventId){
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
@@ -126,6 +127,10 @@ public class UserController {
         Event event = es.getEventById(eventId);
         if (event == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        if (!event.getOrganizer().getUserId().equals(callerId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         List<UserPublicResponse> attendees = event.getAttendees().stream()

@@ -1,5 +1,6 @@
 package edu.jhu.eventservice.services;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,15 @@ public class EventService {
         er.delete(event);
     }
 
+    public List<Event> getUpcomingEvents() {
+        return er.findByDateGreaterThanEqual(LocalDate.now());
+    }
+
     public List<Event> getEventsByUser(User user) {
         return er.findByAttendeesContaining(user);
+    }
+
+    public List<Event> getUpcomingEventsByUser(User user) {
+        return er.findByAttendeesContainingAndDateGreaterThanEqual(user, LocalDate.now());
     }
 }
