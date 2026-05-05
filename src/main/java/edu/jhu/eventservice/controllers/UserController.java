@@ -73,7 +73,7 @@ public class UserController {
         if (callerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
         }
-        if (callerId != userId) {
+        if (!callerId.equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You may only update your own account");
         }
 
@@ -103,7 +103,7 @@ public class UserController {
         if (callerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
         }
-        if (callerId != userId) {
+        if (!callerId.equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You may only delete your own account");
         }
 
@@ -117,18 +117,21 @@ public class UserController {
     }
     
     @GetMapping("/register/{eventId}")
-    public ResponseEntity<List<User>> getUsersRegisteredForEvent(@PathVariable int eventId){
+    public ResponseEntity<List<UserPublicResponse>> getUsersRegisteredForEvent(@PathVariable int eventId){
         Integer callerId = AuthenticatedUser.currentUserId().orElse(null);
         if (callerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         Event event = es.getEventById(eventId);
         if (event == null) {
             return ResponseEntity.notFound().build();
-        }        
-        
-    	return ResponseEntity.ok(event.getAttendees());
+        }
+
+        List<UserPublicResponse> attendees = event.getAttendees().stream()
+                .map(u -> new UserPublicResponse(u.getUserId(), u.getFirstName(), u.getLastName(), u.getPhoneNumber()))
+                .toList();
+        return ResponseEntity.ok(attendees);
     }
     
     private List<String> validateUser(String firstName, String lastName, String email) {

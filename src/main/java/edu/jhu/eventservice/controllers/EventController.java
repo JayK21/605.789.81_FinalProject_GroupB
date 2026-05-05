@@ -142,8 +142,8 @@ public class EventController {
         if (attendees.contains(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is already registered for event");
         }
-        
-        if (attendees.size() >= event.getMaxCapacity()) {
+
+        if (event.getMaxCapacity() != null && attendees.size() >= event.getMaxCapacity()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Event is at max capacity");
         }
         
@@ -174,18 +174,10 @@ public class EventController {
         }
         
         List<User> attendees = event.getAttendees();
-        if (!attendees.contains(user)) {
+        if (!attendees.remove(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not registered for this event");
         }
-        
-        User userToRemove = null;
-        for (User u : attendees) {
-        	if (u.getUserId() == userId) {
-        		userToRemove = u;
-        	}
-        }
-        attendees.remove(userToRemove);
-        
+
         es.addEvent(event);
         return ResponseEntity.ok("User removed from event");
     }
