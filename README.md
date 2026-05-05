@@ -8,15 +8,6 @@ A RESTful API for managing events and RSVPs. Users can create accounts, create e
 
 ---
 
-## Tech Stack
-- Java 17 + Spring Boot
-- Spring Data JPA + MySQL
-- Spring Security + JWT (stateless)
-- Swagger / OpenAPI 3
-- Deployed on Heroku with JawsDB MySQL
-
----
-
 ## Running Locally
 
 **Prerequisites:** Java 17, Maven, MySQL running on port 3306
@@ -81,7 +72,4 @@ export SPRING_DATASOURCE_PASSWORD=your_password
 ## Authentication
 
 Protected endpoints require a Bearer token in the `Authorization` header:
-```
-Authorization: Bearer <token>
-```
 Obtain a token via `POST /api/v1/auth/register` or `POST /api/v1/auth/login`.
